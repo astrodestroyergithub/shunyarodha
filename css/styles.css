@@ -1,0 +1,140 @@
+/* Shunyarodha — Zerodha-Inspired Responsive Design System */
+:root {
+  --sr-blue: #387ed1;
+  --sr-blue-hover: #222222;
+  --sr-blue-dark: #2962ff;
+  --sr-orange: #ff5722;
+  --sr-text-dark: #424242;
+  --sr-text-body: #666666;
+  --sr-text-muted: #9b9b9b;
+  --sr-border: #eeeeee;
+  --sr-bg-subtle: #fbfbfb;
+  --sr-green: #16a34a;
+  --sr-red: #dc2626;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--sr-text-dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+  color: var(--sr-text-dark);
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Zerodha Signature Button */
+.btn-sr-primary {
+  background-color: var(--sr-blue);
+  color: #ffffff;
+  font-weight: 500;
+  border-radius: 3px;
+  transition: background-color 0.18s ease, transform 0.12s ease;
+}
+.btn-sr-primary:hover {
+  background-color: #222222;
+}
+.btn-sr-primary:active {
+  transform: translateY(1px);
+}
+
+/* Navigation active link */
+.nav-link-item {
+  color: #666666;
+  transition: color 0.15s ease;
+  position: relative;
+}
+.nav-link-item:hover,
+.nav-link-item.active {
+  color: var(--sr-blue);
+}
+.nav-link-item.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -20px;
+  height: 2px;
+  background-color: var(--sr-blue);
+}
+
+@media (max-width: 1023px) {
+  .nav-link-item.active::after {
+    display: none;
+  }
+}
+
+/* View Switching Animation */
+.app-view {
+  animation: fadeInView 0.22s ease-out;
+}
+@keyframes fadeInView {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Range Input Styling */
+input[type="range"] {
+  accent-color: var(--sr-blue);
+}
+
+/* Kite Watchlist Hover Actions */
+.watchlist-row .wl-actions {
+  display: none;
+}
+.watchlist-row:hover .wl-actions,
+.watchlist-row:focus-within .wl-actions {
+  display: flex;
+}
+@media (max-width: 640px) {
+  .watchlist-row .wl-actions {
+    display: flex;
+  }
+}
+
+/* Ticker pulse effect */
+.tick-flash-up {
+  animation: flashGreen 0.6s ease;
+}
+.tick-flash-down {
+  animation: flashRed 0.6s ease;
+}
+@keyframes flashGreen {
+  0% { background-color: rgba(22, 163, 74, 0.16); }
+  100% { background-color: transparent; }
+}
+@keyframes flashRed {
+  0% { background-color: rgba(220, 38, 38, 0.16); }
+  100% { background-color: transparent; }
+}

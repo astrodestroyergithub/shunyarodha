@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Shunyarodha — Online platform to invest in stocks, derivatives, mutual funds, ETFs, bonds, and more." />
+  <title>Shunyarodha — Online Stock Trading &amp; Investment Platform</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="bg-white text-[#424242] antialiased selection:bg-[#387ed1] selection:text-white">
+
+  <!-- Top Live NSE/BSE Market Ticker Bar -->
+  <div class="bg-slate-900 text-slate-200 text-xs border-b border-slate-800 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-9 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-3 sm:gap-6 overflow-x-auto no-scrollbar py-1 whitespace-nowrap" id="live-ticker-strip">
+        <div class="flex items-center gap-1.5">
+          <span class="font-semibold text-white">NIFTY 50</span>
+          <span id="ticker-nifty-val" class="font-mono">24,852.15</span>
+          <span id="ticker-nifty-chg" class="text-emerald-400 font-mono text-[11px]">+142.60 (+0.58%)</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="font-semibold text-white">SENSEX</span>
+          <span id="ticker-sensex-val" class="font-mono">81,741.80</span>
+          <span id="ticker-sensex-chg" class="text-emerald-400 font-mono text-[11px]">+468.25 (+0.57%)</span>
+        </div>
+        <div class="hidden sm:flex items-center gap-1.5">
+          <span class="font-semibold text-white">BANK NIFTY</span>
+          <span id="ticker-bank-val" class="font-mono">52,390.40</span>
+          <span id="ticker-bank-chg" class="text-emerald-400 font-mono text-[11px]">+310.15 (+0.60%)</span>
+        </div>
+        <div class="hidden md:flex items-center gap-1.5">
+          <span class="font-semibold text-white">INDIA VIX</span>
+          <span id="ticker-vix-val" class="font-mono">12.84</span>
+          <span id="ticker-vix-chg" class="text-rose-400 font-mono text-[11px]">-0.42 (-3.17%)</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button type="button" id="btn-toggle-live-feed" onclick="toggleLiveMarketFeed()" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-emerald-400 border border-slate-700 transition">
+          <span id="live-feed-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="live-feed-label">NSE Live</span>
+        </button>
+        <button type="button" onclick="switchView('kite')" class="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-[#ff5722] hover:bg-[#e64a19] text-white font-medium text-[11px] transition">
+          <span>Kite Web</span>
+          <span>↗</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Zerodha-Style Main Navbar -->
+  <header class="bg-white/95 backdrop-blur border-b border-[#eeeeee] sticky top-9 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Brand Logo -->
+      <button type="button" onclick="switchView('home')" class="flex items-center gap-2.5 text-left group focus:outline-none">
+        <svg class="w-7 h-7 text-[#387ed1] shrink-0 transition-transform group-hover:scale-105" viewBox="0 0 36 36" fill="none">
+          <path d="M4 28L18 6L32 28H23.5L18 18.8L12.5 28H4Z" fill="#387ed1"/>
+          <path d="M13.5 28L18 20.5L22.5 28H13.5Z" fill="#1d4ed8"/>
+        </svg>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-xl sm:text-[22px] font-bold tracking-[0.14em] text-[#387ed1]">SHUNYARODHA</span>
+          <span class="hidden xl:inline-block text-[10px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-blue-50 text-[#387ed1] font-semibold">Broking</span>
+        </div>
+      </button>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="hidden lg:flex items-center gap-7 text-sm font-normal">
+        <button type="button" id="nav-home" onclick="switchView('home')" class="nav-link-item active">Home</button>
+        <button type="button" id="nav-signup" onclick="switchView('signup')" class="nav-link-item">Signup</button>
+        <button type="button" id="nav-about" onclick="switchView('about')" class="nav-link-item">About</button>
+        <button type="button" id="nav-products" onclick="switchView('products')" class="nav-link-item">Products</button>
+        <button type="button" id="nav-pricing" onclick="switchView('pricing')" class="nav-link-item">Pricing</button>
+        <button type="button" id="nav-varsity" onclick="switchView('varsity')" class="nav-link-item">Varsity</button>
+        <button type="button" id="nav-support" onclick="switchView('support')" class="nav-link-item">Support</button>
+        <button type="button" id="nav-kite" onclick="switchView('kite')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium bg-orange-50 text-[#ff5722] border border-orange-200 hover:bg-[#ff5722] hover:text-white transition">
+          <span class="w-2 h-2 rounded-full bg-current"></span>
+          <span>Kite Terminal</span>
+        </button>
+      </nav>
+
+      <!-- Right Controls: Signature Zerodha Mega-Menu Trigger & Mobile Hamburger -->
+      <div class="flex items-center gap-2">
+        <button type="button" id="btn-mega-menu" onclick="toggleMegaMenu()" aria-label="Toggle Ecosystem Menu" class="p-2 rounded hover:bg-slate-100 text-[#424242] transition flex items-center gap-1.5">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <span class="text-xs font-medium hidden sm:inline text-[#666666]">Menu</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Zerodha Signature Mega-Menu Dropdown & Responsive Mobile Menu -->
+    <div id="mega-menu-panel" class="hidden border-t border-[#eeeeee] bg-white shadow-2xl">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Mobile Primary Nav Links (Visible on <lg screens) -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pb-6 mb-6 border-b border-[#eeeeee] lg:hidden">
+          <button type="button" onclick="switchView('home'); closeMegaMenu();" class="px-3 py-2 text-left text-sm font-medium rounded hover:bg-slate-100 text-[#424242]">Home</button>
+          <button type="button" onclick="switchView('signup'); closeMegaMenu();" class="px-3 py-2 text-left text-sm font-medium rounded hover:bg-slate-100 text-[#387ed1]">Signup Free</button>
+          <button type="button" onclick="switchView('about'); closeMegaMenu();" class="px-3 py-2 text-left text-sm font-medium rounded hover:bg-slate-100 text-[#424242]">About Us</button>
+          <button type="button" onclick="switchView('products'); closeMegaMenu();" class="px-3 py-2 text-left text-sm font-medium rounded hover:bg-slate-100 text-[#424242]">Products</button>
+          <button type="button" onclick="switchView('pricing'); closeMegaMenu();" class="px-3 py-2 text-left text-sm font-medium rounded hover:bg-slate-100 text-[#424242]">Pricing & Calc</button>
+          <button type="button" onclick="switchView('varsity'); closeMegaMenu();" class="px-3 py-2 text-left text-sm font-medium rounded hover:bg-slate-100 text-[#424242]">Varsity</button>
+          <button type="button" onclick="switchView('support'); closeMegaMenu();" class="px-3 py-2 text-left text-sm font-medium rounded hover:bg-slate-100 text-[#424242]">Support Portal</button>
+          <button type="button" onclick="switchView('kite'); closeMegaMenu();" class="px-3 py-2 text-left text-sm font-medium rounded bg-orange-50 text-[#ff5722]">Kite Web Demo</button>
+        </div>
+
+        <!-- 4 Flagship Product Cards (Top of Zerodha Mega Menu) -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pb-6 border-b border-[#eeeeee]">
+          <button type="button" onclick="switchView('kite'); closeMegaMenu();" class="flex flex-col items-center text-center p-3 rounded-lg hover:bg-slate-50 transition group">
+            <div class="w-11 h-11 rounded-full bg-orange-50 text-[#ff5722] flex items-center justify-center font-bold text-lg mb-2 group-hover:scale-105 transition">K</div>
+            <span class="font-semibold text-sm text-[#424242]">Kite</span>
+            <span class="text-xs text-[#9b9b9b]">Trading platform</span>
+          </button>
+          <button type="button" onclick="switchView('products'); closeMegaMenu();" class="flex flex-col items-center text-center p-3 rounded-lg hover:bg-slate-50 transition group">
+            <div class="w-11 h-11 rounded-full bg-blue-50 text-[#387ed1] flex items-center justify-center font-bold text-lg mb-2 group-hover:scale-105 transition">C</div>
+            <span class="font-semibold text-sm text-[#424242]">Console</span>
+            <span class="text-xs text-[#9b9b9b]">Backoffice & Tax P&L</span>
+          </button>
+          <button type="button" onclick="switchView('products'); closeMegaMenu();" class="flex flex-col items-center text-center p-3 rounded-lg hover:bg-slate-50 transition group">
+            <div class="w-11 h-11 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-lg mb-2 group-hover:scale-105 transition">₹</div>
+            <span class="font-semibold text-sm text-[#424242]">Coin</span>
+            <span class="text-xs text-[#9b9b9b]">Direct mutual funds</span>
+          </button>
+          <button type="button" onclick="switchView('products'); closeMegaMenu();" class="flex flex-col items-center text-center p-3 rounded-lg hover:bg-slate-50 transition group">
+            <div class="w-11 h-11 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-sm mb-2 group-hover:scale-105 transition">&lt;/&gt;</div>
+            <span class="font-semibold text-sm text-[#424242]">Kite Connect</span>
+            <span class="text-xs text-[#9b9b9b]">Trading HTTP APIs</span>
+          </button>
+        </div>
+
+        <!-- Bottom Columns of Mega Menu: Utilities, Updates, Education -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6 text-sm">
+          <div>
+            <h4 class="font-semibold text-[#424242] mb-3">Utilities & Calculators</h4>
+            <ul class="space-y-2 text-[#666666]">
+              <li><button type="button" onclick="switchView('pricing'); closeMegaMenu();" class="hover:text-[#387ed1]">Brokerage calculator</button></li>
+              <li><button type="button" onclick="switchView('varsity'); closeMegaMenu();" class="hover:text-[#387ed1]">SIP & Compounding calculator</button></li>
+              <li><button type="button" onclick="switchView('pricing'); closeMegaMenu();" class="hover:text-[#387ed1]">Margin & Span calculator</button></li>
+              <li><button type="button" onclick="openHolidayModal(); closeMegaMenu();" class="hover:text-[#387ed1]">NSE/BSE Market Holiday calendar</button></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-[#424242] mb-3">Updates & Ecosystem</h4>
+            <ul class="space-y-2 text-[#666666]">
+              <li><button type="button" onclick="switchView('about'); closeMegaMenu();" class="hover:text-[#387ed1]">S-Connect blog & tech engineering</button></li>
+              <li><button type="button" onclick="switchView('products'); closeMegaMenu();" class="hover:text-[#387ed1]">The Shunyarodha Universe (30+ startups)</button></li>
+              <li><button type="button" onclick="openIpoModal(); closeMegaMenu();" class="hover:text-[#387ed1]">Upcoming IPOs (UPI Instant Apply)</button></li>
+              <li><button type="button" onclick="switchView('support'); closeMegaMenu();" class="hover:text-[#387ed1]">Market Bulletins & Exchange Circulars</button></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold text-[#424242] mb-3">Education</h4>
+            <div class="flex items-center gap-4">
+              <button type="button" onclick="switchView('varsity'); closeMegaMenu();" class="flex items-center gap-2 p-2 rounded hover:bg-slate-50 text-left">
+                <span class="w-9 h-9 rounded bg-amber-50 text-amber-600 flex items-center justify-center font-bold">V</span>
+                <div>
+                  <div class="font-medium text-[#424242]">Varsity</div>
+                  <div class="text-xs text-[#9b9b9b]">8 Modules + Quizzes</div>
+                </div>
+              </button>
+              <button type="button" onclick="switchView('varsity'); closeMegaMenu();" class="flex items-center gap-2 p-2 rounded hover:bg-slate-50 text-left">
+                <span class="w-9 h-9 rounded bg-sky-50 text-sky-600 flex items-center justify-center font-bold">Q&amp;A</span>
+                <div>
+                  <div class="font-medium text-[#424242]">TradingQ&amp;A</div>
+                  <div class="text-xs text-[#9b9b9b]">Market community</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT VIEWS ==================== -->
+  <main class="min-h-screen">
+
+    <!-- ==================== 1. HOME VIEW (ZERODHA FLAGSHIP CLONE) ==================== -->
+    <section id="view-home" class="app-view">
+      <!-- Hero Section -->
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14 pb-16 text-center">
+        <div class="max-w-4xl mx-auto mb-10">
+          <img src="assets/hero-dashboard.jpg" alt="Shunyarodha Kite Dashboard Showcase" class="w-full max-h-[420px] object-contain mx-auto rounded-lg" />
+        </div>
+        <h1 class="text-3xl sm:text-4xl md:text-[44px] font-semibold text-[#424242] tracking-tight leading-tight mb-4">
+          Invest in everything
+        </h1>
+        <p class="text-base sm:text-xl text-[#424242] font-normal max-w-2xl mx-auto mb-8">
+          Online platform to invest in stocks, derivatives, mutual funds, ETFs, bonds, and more
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5">
+          <button type="button" onclick="switchView('signup')" class="btn-sr-primary px-8 py-3 text-base sm:text-lg w-full sm:w-auto">
+            Sign up for free
+          </button>
+          <button type="button" onclick="switchView('kite')" class="px-6 py-3 text-base sm:text-lg font-medium rounded-[3px] border border-slate-300 text-[#424242] hover:border-[#387ed1] hover:text-[#387ed1] transition w-full sm:w-auto">
+            Try Live Kite Terminal →
+          </button>
+        </div>
+      </div>
+
+      <!-- Trust With Confidence & The Shunyarodha Ecosystem Section -->
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 border-t border-[#eeeeee]">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+          <!-- Left Column: 4 Pillars -->
+          <div class="lg:col-span-5 space-y-7">
+            <h2 class="text-2xl sm:text-[32px] font-semibold text-[#424242] leading-snug">
+              Trust with confidence
+            </h2>
+
+            <div>
+              <h3 class="text-lg sm:text-xl font-medium text-[#424242] mb-2">Customer-first always</h3>
+              <p class="text-sm sm:text-base text-[#666666] leading-relaxed">
+                That's why 1.6+ crore customers trust Shunyarodha with ~₹4.5+ lakh crores of equity investments and contribute to 15% of daily retail exchange volumes in India.
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-lg sm:text-xl font-medium text-[#424242] mb-2">No spam or gimmicks</h3>
+              <p class="text-sm sm:text-base text-[#666666] leading-relaxed">
+                No gimmicks, spam, "gamification", or annoying push notifications. High quality apps that you use at your pace, the way you like.
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-lg sm:text-xl font-medium text-[#424242] mb-2">The Shunyarodha universe</h3>
+              <p class="text-sm sm:text-base text-[#666666] leading-relaxed">
+                Not just an app, but a whole ecosystem. Our investments in 30+ fintech startups offer you tailored services specific to your needs.
+              </p>
+            </div>
+
+            <div>
+              <h3 class="text-lg sm:text-xl font-medium text-[#424242] mb-2">Do better with money</h3>
+              <p class="text-sm sm:text-base text-[#666666] leading-relaxed">
+                With initiatives like <button type="button" onclick="switchView('kite')" class="text-[#387ed1] hover:underline font-medium">Nudge</button> and <button type="button" onclick="switchView('kite')" class="text-[#387ed1] hover:underline font-medium">Kill Switch</button>, we don't just facilitate transactions, but actively help you do better with your money.
+              </p>
+            </div>
+          </div>
+
+          <!-- Right Column: Ecosystem Image & Interactive Product Spotlight -->
+          <div class="lg:col-span-7 flex flex-col items-center">
+            <img src="assets/ecosystem.jpg" alt="The Shunyarodha Financial Ecosystem" class="w-full max-w-lg object-contain rounded-lg mb-6" />
+
+            <!-- Interactive Ecosystem Node Selector -->
+            <div class="w-full bg-[#fbfbfb] border border-[#eeeeee] rounded-lg p-4 mb-6">
+              <div class="flex flex-wrap items-center justify-center gap-2 mb-3">
+                <button type="button" onclick="selectEcoNode('kite')" id="eco-btn-kite" class="px-3 py-1 text-xs font-medium rounded-full bg-[#387ed1] text-white transition">Kite</button>
+                <button type="button" onclick="selectEcoNode('console')" id="eco-btn-console" class="px-3 py-1 text-xs font-medium rounded-full bg-white border border-slate-200 text-[#666666] hover:border-[#387ed1] transition">Console</button>
+                <button type="button" onclick="selectEcoNode('coin')" id="eco-btn-coin" class="px-3 py-1 text-xs font-medium rounded-full bg-white border border-slate-200 text-[#666666] hover:border-[#387ed1] transition">Coin</button>
+                <button type="button" onclick="selectEcoNode('sensibull')" id="eco-btn-sensibull" class="px-3 py-1 text-xs font-medium rounded-full bg-white border border-slate-200 text-[#666666] hover:border-[#387ed1] transition">Sensibull</button>
+                <button type="button" onclick="selectEcoNode('smallcase')" id="eco-btn-smallcase" class="px-3 py-1 text-xs font-medium rounded-full bg-white border border-slate-200 text-[#666666] hover:border-[#387ed1] transition">Smallcase</button>
+                <button type="button" onclick="selectEcoNode('ditto')" id="eco-btn-ditto" class="px-3 py-1 text-xs font-medium rounded-full bg-white border border-slate-200 text-[#666666] hover:border-[#387ed1] transition">Ditto</button>
+              </div>
+              <p id="eco-node-desc" class="text-xs sm:text-sm text-center text-[#666666]">
+                <strong class="text-[#424242]">Kite:</strong> Our ultra-fast flagship trading platform with streaming market data, advanced charts, an elegant UI, and more.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-center gap-6 text-sm sm:text-base font-medium">
+              <button type="button" onclick="switchView('products')" class="text-[#387ed1] hover:text-[#222222] transition">
+                Explore our products →
+              </button>
+              <button type="button" onclick="switchView('kite')" class="text-[#387ed1] hover:text-[#222222] transition">
+                Try Kite demo →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Press / Media Recognition Strip -->
+        <div class="mt-14 pt-8 border-t border-slate-100">
+          <p class="text-center text-xs uppercase tracking-widest text-[#9b9b9b] mb-5">Featured across leading financial publications</p>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 items-center text-center">
+            <div class="py-2 px-3 rounded bg-slate-50 text-slate-500 font-serif font-bold text-sm tracking-tight">The Economic Times</div>
+            <div class="py-2 px-3 rounded bg-slate-50 text-slate-500 font-serif font-bold text-sm tracking-wide">FORBES INDIA</div>
+            <div class="py-2 px-3 rounded bg-slate-50 text-slate-500 font-sans font-bold text-sm">BusinessLine</div>
+            <div class="py-2 px-3 rounded bg-slate-50 text-slate-500 font-serif italic font-bold text-sm">livemint</div>
+            <div class="py-2 px-3 rounded bg-slate-50 text-slate-500 font-mono font-bold text-sm">TechCrunch</div>
+            <div class="py-2 px-3 rounded bg-slate-50 text-slate-500 font-sans font-semibold text-sm">moneycontrol</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unbeatable Pricing Section (Exact Zerodha 3-Badge Layout) -->
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 border-t border-[#eeeeee]">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div class="lg:col-span-5">
+            <h2 class="text-2xl sm:text-[32px] font-semibold text-[#424242] mb-4">Unbeatable pricing</h2>
+            <p class="text-sm sm:text-base text-[#666666] leading-relaxed mb-5">
+              We pioneered the concept of discount broking and price transparency in India. Flat fees and no hidden charges.
+            </p>
+            <button type="button" onclick="switchView('pricing')" class="text-[#387ed1] hover:text-[#222222] font-medium text-sm sm:text-base transition">
+              See pricing &amp; live brokerage calculator →
+            </button>
+          </div>
+          <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="border border-[#eeeeee] rounded-lg p-6 text-center bg-white hover:shadow-sm transition">
+              <div class="text-4xl sm:text-5xl font-bold text-[#ff9800] mb-2">₹0</div>
+              <p class="text-xs sm:text-sm text-[#666666] leading-snug">Free account<br/>opening online</p>
+            </div>
+            <div class="border border-[#eeeeee] rounded-lg p-6 text-center bg-white hover:shadow-sm transition">
+              <div class="text-4xl sm:text-5xl font-bold text-[#ff9800] mb-2">₹0</div>
+              <p class="text-xs sm:text-sm text-[#666666] leading-snug">Free equity delivery and<br/>direct mutual funds</p>
+            </div>
+            <div class="border border-[#eeeeee] rounded-lg p-6 text-center bg-white hover:shadow-sm transition">
+              <div class="text-4xl sm:text-5xl font-bold text-[#ff9800] mb-2">₹20</div>
+              <p class="text-xs sm:text-sm text-[#666666] leading-snug">Intraday and<br/>F&amp;O trades</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Free and Open Market Education (Varsity & TradingQ&A) -->
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 border-t border-[#eeeeee]">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          <div class="lg:col-span-5 flex justify-center">
+            <img src="assets/varsity-education.jpg" alt="Varsity Free Market Education" class="w-full max-w-sm object-contain rounded-lg" />
+          </div>
+          <div class="lg:col-span-7 space-y-5">
+            <h2 class="text-2xl sm:text-[32px] font-semibold text-[#424242]">Free and open market education</h2>
+            <div>
+              <p class="text-sm sm:text-base text-[#666666] leading-relaxed mb-3">
+                Varsity, the largest online stock market education book in the world covering everything from the basics to advanced trading.
+              </p>
+              <button type="button" onclick="switchView('varsity')" class="text-[#387ed1] hover:text-[#222222] font-medium text-sm sm:text-base transition">
+                Varsity →
+              </button>
+            </div>
+            <div class="pt-2">
+              <p class="text-sm sm:text-base text-[#666666] leading-relaxed mb-3">
+                TradingQ&amp;A, the most active trading and investment community in India for all your market related queries.
+              </p>
+              <button type="button" onclick="switchView('varsity')" class="text-[#387ed1] hover:text-[#222222] font-medium text-sm sm:text-base transition">
+                TradingQ&amp;A →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Call to Action: Open a Shunyarodha Account -->
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center border-t border-[#eeeeee]">
+        <h2 class="text-2xl sm:text-[32px] font-semibold text-[#424242] mb-4">Open a Shunyarodha account</h2>
+        <p class="text-sm sm:text-base text-[#666666] mb-8">
+          Modern platforms and apps, ₹0 investments, and flat ₹20 intraday and F&amp;O trades.
+        </p>
+        <button type="button" onclick="switchView('signup')" class="btn-sr-primary px-8 py-3 text-base sm:text-lg">
+          Sign up for free
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== 2. SIGNUP / E-KYC SIMULATOR VIEW ==================== -->
+    <section id="view-signup" class="app-view hidden">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+          <h1 class="text-2xl sm:text-4xl font-semibold text-[#424242] mb-3">
+            Open a free demat and trading account online
+          </h1>
+          <p class="text-sm sm:text-lg text-[#666666]">
+            Start investing brokerage free and join 1.6+ crore investors and traders on Shunyarodha
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center bg-white border border-[#eeeeee] rounded-xl p-6 sm:p-10 shadow-sm">
+          <div class="lg:col-span-6">
+            <img src="assets/hero-dashboard.jpg" alt="Account Opening Preview" class="w-full object-contain rounded-lg mb-6" />
+            <div class="grid grid-cols-2 gap-3 text-xs text-[#666666]">
+              <div class="p-3 rounded bg-slate-50 border border-slate-100">
+                <div class="font-semibold text-[#424242] mb-0.5">100% Paperless e-KYC</div>
+                <div>DigiLocker &amp; Aadhaar OTP enabled</div>
+              </div>
+              <div class="p-3 rounded bg-slate-50 border border-slate-100">
+                <div class="font-semibold text-[#424242] mb-0.5">₹0 Account Opening</div>
+                <div>Zero onboarding charges</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive 3-Step Onboarding Wizard -->
+          <div class="lg:col-span-6">
+            <!-- Step Progress Indicator -->
+            <div class="flex items-center gap-2 mb-6 text-xs font-medium">
+              <span id="kyc-badge-1" class="px-2.5 py-1 rounded bg-[#387ed1] text-white">1. Mobile OTP</span>
+              <span class="text-slate-300">→</span>
+              <span id="kyc-badge-2" class="px-2.5 py-1 rounded bg-slate-100 text-[#666666]">2. PAN &amp; Segments</span>
+              <span class="text-slate-300">→</span>
+              <span id="kyc-badge-3" class="px-2.5 py-1 rounded bg-slate-100 text-[#666666]">3. Ready</span>
+            </div>
+
+            <!-- Step 1: Mobile & OTP -->
+            <div id="kyc-step-1" class="space-y-4">
+              <h2 class="text-xl sm:text-2xl font-semibold text-[#424242]">Signup now</h2>
+              <p class="text-xs sm:text-sm text-[#666666]">Or track your existing application</p>
+              <div>
+                <label for="kyc-mobile" class="block text-xs font-medium text-[#666666] mb-1">Mobile Number</label>
+                <div class="flex">
+                  <span class="inline-flex items-center px-3 text-sm text-[#424242] bg-slate-50 border border-r-0 border-slate-300 rounded-l">+91</span>
+                  <input id="kyc-mobile" type="tel" maxlength="10" value="9876543210" placeholder="Enter 10-digit mobile number" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-r focus:outline-none focus:border-[#387ed1]" />
+                </div>
+              </div>
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label for="kyc-otp" class="block text-xs font-medium text-[#666666]">6-Digit Verification OTP</label>
+                  <button type="button" onclick="fillDemoOtp()" class="text-xs text-[#387ed1] hover:underline">Auto-fill Demo OTP (482910)</button>
+                </div>
+                <input id="kyc-otp" type="text" maxlength="6" value="482910" placeholder="Enter 6-digit OTP" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded focus:outline-none focus:border-[#387ed1]" />
+              </div>
+              <p id="kyc-step1-err" class="text-xs text-rose-600 hidden"></p>
+              <button type="button" onclick="proceedKycStep2()" class="btn-sr-primary w-full py-3 text-sm sm:text-base">
+                Continue to PAN Verification
+              </button>
+              <p class="text-[11px] text-[#9b9b9b] leading-relaxed">
+                By proceeding, you agree to the Shunyarodha terms &amp; privacy policy and authorize CKYC / Kra verification.
+              </p>
+            </div>
+
+            <!-- Step 2: PAN & Trading Segments -->
+            <div id="kyc-step-2" class="space-y-4 hidden">
+              <h2 class="text-xl sm:text-2xl font-semibold text-[#424242]">Verify PAN &amp; Choose Segments</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label for="kyc-name" class="block text-xs font-medium text-[#666666] mb-1">Full Name (as on PAN)</label>
+                  <input id="kyc-name" type="text" value="Aarav Sharma" class="w-full px-3 py-2 text-sm border border-slate-300 rounded focus:outline-none focus:border-[#387ed1]" />
+                </div>
+                <div>
+                  <label for="kyc-pan" class="block text-xs font-medium text-[#666666] mb-1">PAN Number</label>
+                  <input id="kyc-pan" type="text" maxlength="10" value="ABCDE1234F" class="w-full px-3 py-2 text-sm uppercase border border-slate-300 rounded focus:outline-none focus:border-[#387ed1]" />
+                </div>
+              </div>
+              <div>
+                <span class="block text-xs font-medium text-[#666666] mb-2">Select Market Segments to Activate</span>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <label class="flex items-center gap-2 p-2.5 border border-slate-200 rounded bg-slate-50">
+                    <input type="checkbox" checked disabled class="accent-[#387ed1]" />
+                    <span>NSE/BSE Equity (₹0)</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2.5 border border-slate-200 rounded">
+                    <input id="seg-fo" type="checkbox" checked class="accent-[#387ed1]" />
+                    <span>Futures &amp; Options</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2.5 border border-slate-200 rounded">
+                    <input id="seg-mf" type="checkbox" checked class="accent-[#387ed1]" />
+                    <span>Coin Direct Mutual Funds</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2.5 border border-slate-200 rounded">
+                    <input id="seg-comm" type="checkbox" checked class="accent-[#387ed1]" />
+                    <span>MCX Commodities</span>
+                  </label>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <button type="button" onclick="resetKycWizard()" class="px-4 py-2.5 text-sm border border-slate-300 rounded text-[#666666] hover:bg-slate-50">Back</button>
+                <button type="button" onclick="completeKycSignup()" class="btn-sr-primary flex-1 py-2.5 text-sm">Complete Instant e-KYC</button>
+              </div>
+            </div>
+
+            <!-- Step 3: Account Ready -->
+            <div id="kyc-step-3" class="space-y-4 hidden">
+              <div class="p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900">
+                <div class="text-xs uppercase tracking-wider font-semibold text-emerald-700 mb-1">Demat &amp; Trading Account Activated</div>
+                <div class="text-lg font-bold" id="kyc-welcome-title">Welcome, Aarav Sharma!</div>
+                <div class="text-xs mt-1">Client ID: <span id="kyc-client-id" class="font-mono font-bold text-[#387ed1]">SR74920</span> • CDSL BO ID: <span class="font-mono">1208160094821044</span></div>
+              </div>
+              <p class="text-xs sm:text-sm text-[#666666]">
+                Your Shunyarodha Kite account is pre-loaded with ₹1,00,000 virtual demo margin so you can test live order execution, charts, and GTT triggers immediately.
+              </p>
+              <div class="flex flex-col sm:flex-row gap-3">
+                <button type="button" onclick="switchView('kite')" class="btn-sr-primary flex-1 py-3 text-sm">
+                  Launch Kite Terminal Now →
+                </button>
+                <button type="button" onclick="resetKycWizard()" class="px-4 py-3 text-sm border border-slate-300 rounded text-[#666666] hover:bg-slate-50">
+                  Register Another
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Investment Options Grid on Signup Page (Just like Zerodha Signup) -->
+        <div class="mt-16">
+          <h3 class="text-xl sm:text-2xl font-semibold text-[#424242] text-center mb-10">
+            Investment options with Shunyarodha demat account
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="p-5 border border-[#eeeeee] rounded-lg">
+              <div class="w-10 h-10 rounded bg-blue-50 text-[#387ed1] flex items-center justify-center font-bold mb-3">EQ</div>
+              <h4 class="font-semibold text-[#424242] mb-1">Stocks</h4>
+              <p class="text-xs sm:text-sm text-[#666666]">Invest in all exchange-listed securities on NSE and BSE with ₹0 delivery brokerage.</p>
+            </div>
+            <div class="p-5 border border-[#eeeeee] rounded-lg">
+              <div class="w-10 h-10 rounded bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold mb-3">MF</div>
+              <h4 class="font-semibold text-[#424242] mb-1">Mutual funds</h4>
+              <p class="text-xs sm:text-sm text-[#666666]">Invest in commission-free direct mutual funds and save up to 1.5% in yearly commissions.</p>
+            </div>
+            <div class="p-5 border border-[#eeeeee] rounded-lg">
+              <div class="w-10 h-10 rounded bg-amber-50 text-amber-600 flex items-center justify-center font-bold mb-3">IPO</div>
+              <h4 class="font-semibold text-[#424242] mb-1">IPO</h4>
+              <p class="text-xs sm:text-sm text-[#666666]">Apply to the latest mainboard and SME IPOs instantly via UPI 24/7.</p>
+            </div>
+            <div class="p-5 border border-[#eeeeee] rounded-lg">
+              <div class="w-10 h-10 rounded bg-purple-50 text-purple-600 flex items-center justify-center font-bold mb-3">F&amp;O</div>
+              <h4 class="font-semibold text-[#424242] mb-1">Futures &amp; options</h4>
+              <p class="text-xs sm:text-sm text-[#666666]">Hedge and trade index &amp; stock derivatives at flat ₹20 per executed order.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 3. ABOUT US VIEW ==================== -->
+    <section id="view-about" class="app-view hidden">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
+        <div class="max-w-3xl mx-auto text-center pb-14 border-b border-[#eeeeee]">
+          <h1 class="text-2xl sm:text-4xl font-semibold text-[#424242] leading-snug">
+            We pioneered the discount broking model in India.<br class="hidden sm:inline" />
+            Now, we are breaking ground with our technology.
+          </h1>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 py-14 text-sm sm:text-base text-[#666666] leading-relaxed border-b border-[#eeeeee]">
+          <div class="space-y-4">
+            <p>
+              We kicked off operations with the goal of breaking all barriers that traders and investors face in India in terms of cost, support, and technology. We named the company <strong class="text-[#424242]">Shunyarodha</strong>, a tribute to the pioneer <a href="https://zerodha.com" target="_blank" rel="noopener noreferrer" class="text-[#387ed1] hover:underline">Zerodha</a> — combining <em>"Shunya"</em> (Sanskrit for Zero) and <em>"Rodha"</em> (Sanskrit for Barrier).
+            </p>
+            <p>
+              Today, our disruptive flat-fee pricing model and in-house technology architecture have made us the benchmark for high-reliability, low-latency retail stock broking.
+            </p>
+            <p>
+              Over 1.6+ crore clients place hundreds of millions of orders every year through our powerful ecosystem of investment platforms, contributing over 15% of all Indian retail trading volumes.
+            </p>
+          </div>
+          <div class="space-y-4">
+            <p>
+              In addition, we run a number of popular open online educational and community initiatives to empower retail traders and investors through <button type="button" onclick="switchView('varsity')" class="text-[#387ed1] hover:underline">Varsity</button> and <button type="button" onclick="switchView('varsity')" class="text-[#387ed1] hover:underline">TradingQ&amp;A</button>.
+            </p>
+            <p>
+              <strong class="text-[#424242]">Rainmatter</strong>, our fintech fund and incubator, has invested in over 30 capital market startups to grow the Indian financial ecosystem with zero lock-in.
+            </p>
+            <p>
+              And yet, we are always up to something new every day. Catch up on the latest engineering updates on our platform or test our live <button type="button" onclick="switchView('kite')" class="text-[#387ed1] hover:underline">Kite Terminal</button>.
+            </p>
+          </div>
+        </div>
+
+        <!-- Key Numbers Strip -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 py-12">
+          <div class="p-6 border border-[#eeeeee] rounded-lg text-center">
+            <div class="text-3xl font-bold text-[#387ed1] mb-1">1.6+ Cr</div>
+            <div class="text-xs sm:text-sm text-[#666666]">Active retail clients</div>
+          </div>
+          <div class="p-6 border border-[#eeeeee] rounded-lg text-center">
+            <div class="text-3xl font-bold text-[#387ed1] mb-1">₹4.5+ L Cr</div>
+            <div class="text-xs sm:text-sm text-[#666666]">Client assets in custody</div>
+          </div>
+          <div class="p-6 border border-[#eeeeee] rounded-lg text-center">
+            <div class="text-3xl font-bold text-[#387ed1] mb-1">15%+</div>
+            <div class="text-xs sm:text-sm text-[#666666]">Daily India retail volume</div>
+          </div>
+          <div class="p-6 border border-[#eeeeee] rounded-lg text-center">
+            <div class="text-3xl font-bold text-[#387ed1] mb-1">100%</div>
+            <div class="text-xs sm:text-sm text-[#666666]">Bootstrapped &amp; debt-free</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 4. PRODUCTS & UNIVERSE VIEW ==================== -->
+    <section id="view-products" class="app-view hidden">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
+        <!-- Header -->
+        <div class="text-center pb-14 border-b border-[#eeeeee]">
+          <h1 class="text-3xl sm:text-[42px] font-semibold text-[#424242] mb-3">Shunyarodha Products</h1>
+          <p class="text-base sm:text-xl text-[#666666] mb-4">Sleek, modern, and intuitive trading platforms</p>
+          <p class="text-sm text-[#666666]">
+            Check out our <button type="button" onclick="switchView('signup')" class="text-[#387ed1] hover:underline font-medium">investment offerings →</button>
+          </p>
+        </div>
+
+        <!-- Product 1: Kite -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center py-14 border-b border-[#eeeeee]">
+          <div class="lg:col-span-7">
+            <img src="assets/hero-dashboard.jpg" alt="Kite Trading Platform" class="w-full rounded-lg border border-[#eeeeee]" />
+          </div>
+          <div class="lg:col-span-5 space-y-4">
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-orange-50 text-[#ff5722] text-xs font-semibold">FLAGSHIP PLATFORM</div>
+            <h2 class="text-2xl sm:text-3xl font-semibold text-[#424242]">Kite</h2>
+            <p class="text-sm sm:text-base text-[#666666] leading-relaxed">
+              Our ultra-fast flagship trading platform with streaming market data, advanced charts, an elegant UI, and more. Enjoy the Kite experience seamlessly on your web browser, Android, and iOS devices.
+            </p>
+            <div class="flex flex-wrap gap-6 pt-2 text-sm font-medium">
+              <button type="button" onclick="switchView('kite')" class="text-[#387ed1] hover:underline">Try Kite live demo →</button>
+              <button type="button" onclick="switchView('signup')" class="text-[#387ed1] hover:underline">Open account →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 2: Console -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center py-14 border-b border-[#eeeeee]">
+          <div class="lg:col-span-5 space-y-4 order-2 lg:order-1">
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-blue-50 text-[#387ed1] text-xs font-semibold">ANALYTICS &amp; REPORTING</div>
+            <h2 class="text-2xl sm:text-3xl font-semibold text-[#424242]">Console</h2>
+            <p class="text-sm sm:text-base text-[#666666] leading-relaxed">
+              The central dashboard for your Shunyarodha account. Gain insights into your trades and investments with in-depth visual reports, tax-ready P&amp;L statements, Family Portfolio aggregation, and tax-loss harvesting alerts.
+            </p>
+            <div class="pt-2">
+              <button type="button" onclick="switchView('kite')" class="text-[#387ed1] hover:underline text-sm font-medium">Explore Console Holdings in Demo →</button>
+            </div>
+          </div>
+          <div class="lg:col-span-7 order-1 lg:order-2">
+            <!-- Interactive Console Portfolio Heatmap Preview Card -->
+            <div class="border border-[#eeeeee] rounded-xl p-6 bg-[#fbfbfb]">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <div class="text-xs uppercase tracking-wider text-[#9b9b9b] font-semibold">Console Family Portfolio Snapshot</div>
+                  <div class="text-xl font-bold text-[#424242]">₹18,42,650.00 <span class="text-sm font-medium text-emerald-600">+₹3,14,200 (+20.55%)</span></div>
+                </div>
+                <span class="px-2.5 py-1 rounded bg-blue-50 text-[#387ed1] text-xs font-medium">FY 2026-27 Tax Ready</span>
+              </div>
+              <div class="grid grid-cols-3 sm:grid-cols-4 gap-2 text-xs">
+                <div class="p-3 rounded bg-emerald-600 text-white">
+                  <div class="font-bold">RELIANCE</div>
+                  <div class="opacity-90">+18.4%</div>
+                </div>
+                <div class="p-3 rounded bg-emerald-500 text-white">
+                  <div class="font-bold">TCS</div>
+                  <div class="opacity-90">+14.2%</div>
+                </div>
+                <div class="p-3 rounded bg-emerald-700 text-white">
+                  <div class="font-bold">ICICIBANK</div>
+                  <div class="opacity-90">+26.8%</div>
+                </div>
+                <div class="p-3 rounded bg-rose-500 text-white">
+                  <div class="font-bold">INFY</div>
+                  <div class="opacity-90">-2.1%</div>
+                </div>
+                <div class="p-3 rounded bg-emerald-500 text-white">
+                  <div class="font-bold">BHARTIARTL</div>
+                  <div class="opacity-90">+31.4%</div>
+                </div>
+                <div class="p-3 rounded bg-emerald-600 text-white">
+                  <div class="font-bold">SBIN</div>
+                  <div class="opacity-90">+19.0%</div>
+                </div>
+                <div class="p-3 rounded bg-sky-600 text-white">
+                  <div class="font-bold">NIFTYBEES</div>
+                  <div class="opacity-90">+15.6%</div>
+                </div>
+                <div class="p-3 rounded bg-amber-500 text-white">
+                  <div class="font-bold">SGB GOLD</div>
+                  <div class="opacity-90">+22.3%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 3: Coin & Kite Connect API -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 py-14 border-b border-[#eeeeee]">
+          <div class="p-6 sm:p-8 border border-[#eeeeee] rounded-xl bg-white">
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 text-xs font-semibold mb-3">0% COMMISSION</div>
+            <h3 class="text-2xl font-semibold text-[#424242] mb-3">Coin</h3>
+            <p class="text-sm sm:text-base text-[#666666] leading-relaxed mb-5">
+              Buy direct mutual funds online, commission-free, delivered directly to your Demat account. Step-up SIPs, Sovereign Gold Bonds, and Government T-Bills in one tap.
+            </p>
+            <button type="button" onclick="switchView('varsity')" class="text-[#387ed1] hover:underline text-sm font-medium">Calculate Direct MF SIP Savings →</button>
+          </div>
+          <div class="p-6 sm:p-8 border border-[#eeeeee] rounded-xl bg-white">
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-indigo-50 text-indigo-700 text-xs font-semibold mb-3">DEVELOPER APIS</div>
+            <h3 class="text-2xl font-semibold text-[#424242] mb-3">Kite Connect API</h3>
+            <p class="text-sm sm:text-base text-[#666666] leading-relaxed mb-5">
+              Build powerful trading platforms and experiences with our super simple HTTP/JSON APIs. If you are a startup, build your investment app and showcase it to our clientbase.
+            </p>
+            <button type="button" onclick="switchView('kite')" class="text-[#387ed1] hover:underline text-sm font-medium">Test Order Execution Engine →</button>
+          </div>
+        </div>
+
+        <!-- The Shunyarodha Universe (6 Partner Cards) -->
+        <div class="pt-14 text-center">
+          <h2 class="text-2xl sm:text-3xl font-semibold text-[#424242] mb-3">The Shunyarodha Universe</h2>
+          <p class="text-sm sm:text-base text-[#666666] max-w-2xl mx-auto mb-10">
+            Extend your trading and investment experience even further with our partner platforms—log in seamlessly with your Shunyarodha Kite credentials.
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-left">
+            <div class="p-6 border border-[#eeeeee] rounded-lg hover:border-[#387ed1] transition">
+              <div class="font-bold text-lg text-[#424242] mb-1">Sensibull</div>
+              <div class="text-xs text-[#387ed1] font-medium mb-2">Options Trading Platform</div>
+              <p class="text-xs sm:text-sm text-[#666666]">Options trading platform that lets you create strategies, analyze positions, and examine option chains and OI data.</p>
+            </div>
+            <div class="p-6 border border-[#eeeeee] rounded-lg hover:border-[#387ed1] transition">
+              <div class="font-bold text-lg text-[#424242] mb-1">Tijori Finance</div>
+              <div class="text-xs text-[#387ed1] font-medium mb-2">Fundamental Research</div>
+              <p class="text-xs sm:text-sm text-[#666666]">Investment research platform that offers detailed insights on stocks, sectors, supply chains, and macro indicators.</p>
+            </div>
+            <div class="p-6 border border-[#eeeeee] rounded-lg hover:border-[#387ed1] transition">
+              <div class="font-bold text-lg text-[#424242] mb-1">Streak</div>
+              <div class="text-xs text-[#387ed1] font-medium mb-2">Systematic Algo Trading</div>
+              <p class="text-xs sm:text-sm text-[#666666]">Systematic trading platform that allows you to create and backtest strategies without coding.</p>
+            </div>
+            <div class="p-6 border border-[#eeeeee] rounded-lg hover:border-[#387ed1] transition">
+              <div class="font-bold text-lg text-[#424242] mb-1">smallcase</div>
+              <div class="text-xs text-[#387ed1] font-medium mb-2">Thematic Investment Baskets</div>
+              <p class="text-xs sm:text-sm text-[#666666]">Thematic investment platform that helps you invest in diversified baskets of stocks and ETFs.</p>
+            </div>
+            <div class="p-6 border border-[#eeeeee] rounded-lg hover:border-[#387ed1] transition">
+              <div class="font-bold text-lg text-[#424242] mb-1">Ditto</div>
+              <div class="text-xs text-[#387ed1] font-medium mb-2">Insurance Advisory</div>
+              <p class="text-xs sm:text-sm text-[#666666]">Personalized advice on life and health insurance. No spam and no mis-selling.</p>
+            </div>
+            <div class="p-6 border border-[#eeeeee] rounded-lg hover:border-[#387ed1] transition">
+              <div class="font-bold text-lg text-[#424242] mb-1">Shunyarodha Fund House</div>
+              <div class="text-xs text-[#387ed1] font-medium mb-2">Passive Index Funds &amp; ETFs</div>
+              <p class="text-xs sm:text-sm text-[#666666]">Our asset management venture creating simple and transparent index funds to help you save for your goals.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 5. PRICING & INTERACTIVE BROKERAGE CALCULATOR VIEW ==================== -->
+    <section id="view-pricing" class="app-view hidden">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
+        <!-- Pricing Header -->
+        <div class="text-center pb-14 border-b border-[#eeeeee]">
+          <h1 class="text-3xl sm:text-[42px] font-semibold text-[#424242] mb-3">Charges</h1>
+          <p class="text-base sm:text-xl text-[#9b9b9b]">List of all charges and taxes — 100% transparent</p>
+        </div>
+
+        <!-- 3 Iconic Pricing Columns -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-14 border-b border-[#eeeeee] text-center">
+          <div class="p-6">
+            <div class="text-5xl sm:text-6xl font-bold text-[#ff9800] mb-4">₹0</div>
+            <h2 class="text-xl sm:text-2xl font-semibold text-[#424242] mb-3">Free equity delivery</h2>
+            <p class="text-sm sm:text-base text-[#666666]">
+              All equity delivery investments (NSE, BSE), are absolutely free — ₹ 0 brokerage.
+            </p>
+          </div>
+          <div class="p-6">
+            <div class="text-5xl sm:text-6xl font-bold text-[#ff9800] mb-4">₹20</div>
+            <h2 class="text-xl sm:text-2xl font-semibold text-[#424242] mb-3">Intraday and F&amp;O trades</h2>
+            <p class="text-sm sm:text-base text-[#666666]">
+              Flat ₹ 20 or 0.03% (whichever is lower) per executed order on intraday trades across equity, currency, and commodity trades. Flat ₹20 on all option trades.
+            </p>
+          </div>
+          <div class="p-6">
+            <div class="text-5xl sm:text-6xl font-bold text-[#ff9800] mb-4">₹0</div>
+            <h2 class="text-xl sm:text-2xl font-semibold text-[#424242] mb-3">Free direct MF</h2>
+            <p class="text-sm sm:text-base text-[#666666]">
+              All direct mutual fund investments are absolutely free — ₹ 0 commissions &amp; DP charges.
+            </p>
+          </div>
+        </div>
+
+        <!-- Interactive Brokerage & Statutory Tax Calculator -->
+        <div class="py-14 border-b border-[#eeeeee]">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <div>
+              <h2 class="text-2xl sm:text-3xl font-semibold text-[#424242]">Interactive Brokerage Calculator</h2>
+              <p class="text-sm text-[#666666]">Calculate exact brokerage, STT, Exchange Txn Charge, GST, SEBI fees, and Stamp Duty</p>
+            </div>
+            <!-- Segment Selector Pills -->
+            <div class="flex flex-wrap gap-2">
+              <button type="button" id="calc-mode-intraday" onclick="setCalcMode('intraday')" class="px-3.5 py-1.5 rounded text-xs sm:text-sm font-medium bg-[#387ed1] text-white">Intraday Equity</button>
+              <button type="button" id="calc-mode-delivery" onclick="setCalcMode('delivery')" class="px-3.5 py-1.5 rounded text-xs sm:text-sm font-medium bg-slate-100 text-[#424242] hover:bg-slate-200">Delivery Equity</button>
+              <button type="button" id="calc-mode-futures" onclick="setCalcMode('futures')" class="px-3.5 py-1.5 rounded text-xs sm:text-sm font-medium bg-slate-100 text-[#424242] hover:bg-slate-200">F&amp;O Futures</button>
+              <button type="button" id="calc-mode-options" onclick="setCalcMode('options')" class="px-3.5 py-1.5 rounded text-xs sm:text-sm font-medium bg-slate-100 text-[#424242] hover:bg-slate-200">F&amp;O Options</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-[#fbfbfb] border border-[#eeeeee] rounded-xl p-6 sm:p-8">
+            <!-- Calculator Inputs -->
+            <div class="lg:col-span-5 space-y-5">
+              <div>
+                <div class="flex justify-between text-xs font-medium text-[#666666] mb-1">
+                  <label for="calc-buy">BUY PRICE (₹)</label>
+                  <span class="font-mono text-[#424242]" id="calc-buy-label">₹1,000</span>
+                </div>
+                <input id="calc-buy" type="number" min="1" step="0.5" value="1000" oninput="updateBrokerageCalc()" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded bg-white focus:outline-none focus:border-[#387ed1]" />
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs font-medium text-[#666666] mb-1">
+                  <label for="calc-sell">SELL PRICE (₹)</label>
+                  <span class="font-mono text-[#424242]" id="calc-sell-label">₹1,025</span>
+                </div>
+                <input id="calc-sell" type="number" min="1" step="0.5" value="1025" oninput="updateBrokerageCalc()" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded bg-white focus:outline-none focus:border-[#387ed1]" />
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs font-medium text-[#666666] mb-1">
+                  <label for="calc-qty">QUANTITY (SHARES / LOT UNITS)</label>
+                  <span class="font-mono text-[#424242]" id="calc-qty-label">400</span>
+                </div>
+                <input id="calc-qty" type="number" min="1" step="1" value="400" oninput="updateBrokerageCalc()" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded bg-white focus:outline-none focus:border-[#387ed1] mb-2" />
+                <input id="calc-qty-range" type="range" min="1" max="5000" value="400" oninput="syncQtyFromRange()" class="w-full" />
+              </div>
+
+              <div>
+                <span class="block text-xs font-medium text-[#666666] mb-1.5">EXCHANGE</span>
+                <div class="flex gap-4 text-sm">
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="radio" name="calc-exchange" id="calc-ex-nse" value="NSE" checked onchange="updateBrokerageCalc()" class="accent-[#387ed1]" />
+                    <span>NSE</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer">
+                    <input type="radio" name="calc-exchange" id="calc-ex-bse" value="BSE" onchange="updateBrokerageCalc()" class="accent-[#387ed1]" />
+                    <span>BSE</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Calculator Breakdown Output -->
+            <div class="lg:col-span-7 bg-white border border-[#eeeeee] rounded-lg p-5 sm:p-6">
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pb-5 mb-5 border-b border-[#eeeeee]">
+                <div>
+                  <div class="text-xs text-[#9b9b9b]">Turnover</div>
+                  <div id="res-turnover" class="text-base sm:text-lg font-semibold font-mono text-[#424242]">₹8,10,000.00</div>
+                </div>
+                <div>
+                  <div class="text-xs text-[#9b9b9b]">Total Tax &amp; Charges</div>
+                  <div id="res-total-charges" class="text-base sm:text-lg font-semibold font-mono text-rose-600">₹214.52</div>
+                </div>
+                <div class="col-span-2 sm:col-span-1">
+                  <div class="text-xs text-[#9b9b9b]">Net Profit / Loss</div>
+                  <div id="res-net-pnl" class="text-base sm:text-lg font-bold font-mono text-emerald-600">+₹9,785.48</div>
+                </div>
+              </div>
+
+              <div class="space-y-2.5 text-xs sm:text-sm">
+                <div class="flex justify-between">
+                  <span class="text-[#666666]">Shunyarodha Brokerage</span>
+                  <span id="res-brokerage" class="font-mono text-[#424242]">₹40.00</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#666666]">STT / CTT (Securities Transaction Tax)</span>
+                  <span id="res-stt" class="font-mono text-[#424242]">₹102.50</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#666666]">Exchange Transaction Charges</span>
+                  <span id="res-exch" class="font-mono text-[#424242]">₹26.08</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#666666]">SEBI Turnover Charges</span>
+                  <span id="res-sebi" class="font-mono text-[#424242]">₹0.81</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#666666]">GST (18% on Brokerage + Txn + SEBI)</span>
+                  <span id="res-gst" class="font-mono text-[#424242]">₹12.04</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-[#666666]">Stamp Duty</span>
+                  <span id="res-stamp" class="font-mono text-[#424242]">₹12.00</span>
+                </div>
+                <div class="flex justify-between pt-2.5 border-t border-slate-100 font-medium">
+                  <span class="text-[#424242]">Points to Breakeven</span>
+                  <span id="res-breakeven" class="font-mono text-[#387ed1]">₹0.48 / share</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detailed Regulatory Charges Table -->
+        <div class="pt-12">
+          <h3 class="text-xl sm:text-2xl font-semibold text-[#424242] mb-6">Equity &amp; Derivatives Charge Structure</h3>
+          <div class="overflow-x-auto border border-[#eeeeee] rounded-lg">
+            <table class="w-full text-left text-xs sm:text-sm">
+              <thead class="bg-slate-50 border-b border-[#eeeeee] text-[#424242]">
+                <tr>
+                  <th class="p-3.5 font-semibold">Charge Head</th>
+                  <th class="p-3.5 font-semibold">Equity Delivery</th>
+                  <th class="p-3.5 font-semibold">Equity Intraday</th>
+                  <th class="p-3.5 font-semibold">F&amp;O Futures</th>
+                  <th class="p-3.5 font-semibold">F&amp;O Options</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#eeeeee] text-[#666666]">
+                <tr>
+                  <td class="p-3.5 font-medium text-[#424242]">Brokerage</td>
+                  <td class="p-3.5 text-emerald-700 font-medium">Zero Brokerage</td>
+                  <td class="p-3.5">0.03% or ₹20/executed order whichever is lower</td>
+                  <td class="p-3.5">0.03% or ₹20/executed order whichever is lower</td>
+                  <td class="p-3.5">Flat ₹20 per executed order</td>
+                </tr>
+                <tr>
+                  <td class="p-3.5 font-medium text-[#424242]">STT / CTT</td>
+                  <td class="p-3.5">0.1% on buy &amp; sell</td>
+                  <td class="p-3.5">0.025% on the sell side</td>
+                  <td class="p-3.5">0.02% on the sell side</td>
+                  <td class="p-3.5">0.1% on sell side (on premium)</td>
+                </tr>
+                <tr>
+                  <td class="p-3.5 font-medium text-[#424242]">Transaction charges</td>
+                  <td class="p-3.5">NSE: 0.00297% | BSE: 0.00375%</td>
+                  <td class="p-3.5">NSE: 0.00297% | BSE: 0.00375%</td>
+                  <td class="p-3.5">NSE: 0.00173% | BSE: 0</td>
+                  <td class="p-3.5">NSE: 0.03503% (on premium)</td>
+                </tr>
+                <tr>
+                  <td class="p-3.5 font-medium text-[#424242]">GST</td>
+                  <td colspan="4" class="p-3.5">18% on (brokerage + SEBI charges + transaction charges)</td>
+                </tr>
+                <tr>
+                  <td class="p-3.5 font-medium text-[#424242]">SEBI charges</td>
+                  <td colspan="4" class="p-3.5">₹10 / crore</td>
+                </tr>
+                <tr>
+                  <td class="p-3.5 font-medium text-[#424242]">Stamp charges</td>
+                  <td class="p-3.5">0.015% or ₹1500/cr on buy</td>
+                  <td class="p-3.5">0.003% or ₹300/cr on buy</td>
+                  <td class="p-3.5">0.002% or ₹200/cr on buy</td>
+                  <td class="p-3.5">0.003% or ₹300/cr on buy</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 6. VARSITY & SIP CALCULATOR VIEW ==================== -->
+    <section id="view-varsity" class="app-view hidden">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center pb-14 border-b border-[#eeeeee]">
+          <div class="lg:col-span-7 space-y-4">
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-amber-50 text-amber-700 text-xs font-semibold">VARSITY BY SHUNYARODHA</div>
+            <h1 class="text-3xl sm:text-[40px] font-semibold text-[#424242] leading-tight">
+              Free and open stock market and financial education
+            </h1>
+            <p class="text-sm sm:text-base text-[#666666] leading-relaxed">
+              Varsity is an extensive and in-depth collection of stock market and financial lessons. It is openly accessible to everyone with no registration, paywalls, or upsells. Click any module below to study key concepts and test your knowledge.
+            </p>
+          </div>
+          <div class="lg:col-span-5 flex justify-center">
+            <img src="assets/varsity-education.jpg" alt="Varsity Education" class="w-full max-w-xs object-contain rounded-lg" />
+          </div>
+        </div>
+
+        <!-- 6 Interactive Varsity Modules Grid -->
+        <div class="py-12 border-b border-[#eeeeee]">
+          <h2 class="text-xl sm:text-2xl font-semibold text-[#424242] mb-6">Explore Modules (Click a module to study &amp; take quiz)</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <button type="button" onclick="openVarsityModule(0)" class="text-left p-6 border border-[#eeeeee] rounded-xl hover:border-[#387ed1] hover:shadow-sm transition bg-white">
+              <div class="text-xs font-bold text-sky-600 mb-1">MODULE 1 • 15 CHAPTERS</div>
+              <h3 class="text-lg font-semibold text-[#424242] mb-2">Introduction to Stock Markets</h3>
+              <p class="text-xs sm:text-sm text-[#666666] mb-3">IPO markets, NSE/BSE indices, corporate actions (dividends, splits, bonuses), and settlement cycles.</p>
+              <span class="text-xs font-medium text-[#387ed1]">Read summary &amp; quiz →</span>
+            </button>
+
+            <button type="button" onclick="openVarsityModule(1)" class="text-left p-6 border border-[#eeeeee] rounded-xl hover:border-[#387ed1] hover:shadow-sm transition bg-white">
+              <div class="text-xs font-bold text-emerald-600 mb-1">MODULE 2 • 22 CHAPTERS</div>
+              <h3 class="text-lg font-semibold text-[#424242] mb-2">Technical Analysis</h3>
+              <p class="text-xs sm:text-sm text-[#666666] mb-3">Japanese candlestick patterns, support &amp; resistance, volume analysis, moving averages, and RSI/MACD.</p>
+              <span class="text-xs font-medium text-[#387ed1]">Read summary &amp; quiz →</span>
+            </button>
+
+            <button type="button" onclick="openVarsityModule(2)" class="text-left p-6 border border-[#eeeeee] rounded-xl hover:border-[#387ed1] hover:shadow-sm transition bg-white">
+              <div class="text-xs font-bold text-amber-600 mb-1">MODULE 3 • 16 CHAPTERS</div>
+              <h3 class="text-lg font-semibold text-[#424242] mb-2">Fundamental Analysis</h3>
+              <p class="text-xs sm:text-sm text-[#666666] mb-3">Reading P&amp;L statements, Balance Sheets, Cash Flow, ROE/ROCE ratios, and Discounted Cash Flow (DCF).</p>
+              <span class="text-xs font-medium text-[#387ed1]">Read summary &amp; quiz →</span>
+            </button>
+
+            <button type="button" onclick="openVarsityModule(3)" class="text-left p-6 border border-[#eeeeee] rounded-xl hover:border-[#387ed1] hover:shadow-sm transition bg-white">
+              <div class="text-xs font-bold text-purple-600 mb-1">MODULE 4 • 13 CHAPTERS</div>
+              <h3 class="text-lg font-semibold text-[#424242] mb-2">Futures Trading</h3>
+              <p class="text-xs sm:text-sm text-[#666666] mb-3">Leverage, SPAN &amp; Exposure margins, mark-to-market (MTM) settlement, hedging with beta, and open interest.</p>
+              <span class="text-xs font-medium text-[#387ed1]">Read summary &amp; quiz →</span>
+            </button>
+
+            <button type="button" onclick="openVarsityModule(4)" class="text-left p-6 border border-[#eeeeee] rounded-xl hover:border-[#387ed1] hover:shadow-sm transition bg-white">
+              <div class="text-xs font-bold text-rose-600 mb-1">MODULE 5 • 25 CHAPTERS</div>
+              <h3 class="text-lg font-semibold text-[#424242] mb-2">Options Theory &amp; Greeks</h3>
+              <p class="text-xs sm:text-sm text-[#666666] mb-3">Call &amp; Put payoffs, Delta, Gamma, Theta decay, Vega, Implied Volatility (IV), and Bull/Bear spreads.</p>
+              <span class="text-xs font-medium text-[#387ed1]">Read summary &amp; quiz →</span>
+            </button>
+
+            <button type="button" onclick="openVarsityModule(5)" class="text-left p-6 border border-[#eeeeee] rounded-xl hover:border-[#387ed1] hover:shadow-sm transition bg-white">
+              <div class="text-xs font-bold text-indigo-600 mb-1">MODULE 6 • 30 CHAPTERS</div>
+              <h3 class="text-lg font-semibold text-[#424242] mb-2">Personal Finance &amp; Mutual Funds</h3>
+              <p class="text-xs sm:text-sm text-[#666666] mb-3">Direct vs Regular plans, XIRR, rolling returns, debt fund duration risk, asset allocation, and retirement.</p>
+              <span class="text-xs font-medium text-[#387ed1]">Read summary &amp; quiz →</span>
+            </button>
+          </div>
+
+          <!-- Interactive Module Reader & Mini Quiz Drawer -->
+          <div id="varsity-reader-box" class="mt-8 p-6 sm:p-8 border border-blue-200 rounded-xl bg-blue-50/40">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+              <span id="vr-badge" class="text-xs font-bold uppercase tracking-wider text-[#387ed1]">MODULE 1 • INTRODUCTION TO STOCK MARKETS</span>
+              <span class="text-xs text-[#666666]">Interactive Study Card</span>
+            </div>
+            <h3 id="vr-title" class="text-xl font-bold text-[#424242] mb-2">Why Do Companies Go Public (IPO) &amp; How T+1 Settlement Works</h3>
+            <p id="vr-body" class="text-sm text-[#666666] leading-relaxed mb-5">
+              Indian equity markets operate on a T+1 rolling settlement cycle. When you buy shares on NSE or BSE today (Trade Day T), the shares are credited to your CDSL/NSDL Demat account on the very next working day (T+1) with zero delivery brokerage on Shunyarodha.
+            </p>
+            <div class="bg-white border border-[#eeeeee] rounded-lg p-4">
+              <div id="vr-quiz-q" class="text-xs sm:text-sm font-semibold text-[#424242] mb-3">
+                Quick Check: Under India's T+1 settlement cycle, if you buy delivery shares on Monday, when are they credited to your Demat account?
+              </div>
+              <div id="vr-quiz-options" class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                <button type="button" onclick="answerVarsityQuiz(0)" class="p-2.5 border border-slate-200 rounded hover:border-[#387ed1] text-left">A) Tuesday (T+1 working day)</button>
+                <button type="button" onclick="answerVarsityQuiz(1)" class="p-2.5 border border-slate-200 rounded hover:border-[#387ed1] text-left">B) Thursday (T+3 working days)</button>
+                <button type="button" onclick="answerVarsityQuiz(2)" class="p-2.5 border border-slate-200 rounded hover:border-[#387ed1] text-left">C) Next Monday (T+7 days)</button>
+              </div>
+              <div id="vr-quiz-feedback" class="mt-3 text-xs font-medium hidden"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direct Mutual Fund SIP & Commission Savings Calculator -->
+        <div class="pt-12">
+          <h2 class="text-2xl font-semibold text-[#424242] mb-2">Coin Direct Mutual Fund SIP Calculator</h2>
+          <p class="text-sm text-[#666666] mb-6">See how much extra wealth you compound by investing in 0% commission Direct Mutual Funds on Coin vs Regular Plans</p>
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-[#fbfbfb] border border-[#eeeeee] rounded-xl p-6 sm:p-8">
+            <div class="lg:col-span-6 space-y-5">
+              <div>
+                <div class="flex justify-between text-xs font-medium text-[#666666] mb-1">
+                  <label for="sip-monthly">MONTHLY SIP INVESTMENT (₹)</label>
+                  <span id="sip-monthly-lbl" class="font-mono font-bold text-[#424242]">₹25,000</span>
+                </div>
+                <input id="sip-monthly" type="range" min="1000" max="200000" step="1000" value="25000" oninput="updateSipCalculator()" class="w-full" />
+              </div>
+              <div>
+                <div class="flex justify-between text-xs font-medium text-[#666666] mb-1">
+                  <label for="sip-rate">EXPECTED ANNUAL RETURN (% P.A.)</label>
+                  <span id="sip-rate-lbl" class="font-mono font-bold text-[#424242]">13%</span>
+                </div>
+                <input id="sip-rate" type="range" min="6" max="22" step="0.5" value="13" oninput="updateSipCalculator()" class="w-full" />
+              </div>
+              <div>
+                <div class="flex justify-between text-xs font-medium text-[#666666] mb-1">
+                  <label for="sip-years">INVESTMENT HORIZON (YEARS)</label>
+                  <span id="sip-years-lbl" class="font-mono font-bold text-[#424242]">15 Years</span>
+                </div>
+                <input id="sip-years" type="range" min="1" max="35" step="1" value="15" oninput="updateSipCalculator()" class="w-full" />
+              </div>
+            </div>
+            <div class="lg:col-span-6 bg-white border border-[#eeeeee] rounded-lg p-6 flex flex-col justify-between">
+              <div class="grid grid-cols-2 gap-4 pb-4 border-b border-[#eeeeee]">
+                <div>
+                  <div class="text-xs text-[#9b9b9b]">Total Invested</div>
+                  <div id="sip-res-invested" class="text-lg font-semibold font-mono text-[#424242]">₹45,00,000</div>
+                </div>
+                <div>
+                  <div class="text-xs text-[#9b9b9b]">Coin Direct Plan Corpus</div>
+                  <div id="sip-res-corpus" class="text-xl font-bold font-mono text-[#387ed1]">₹1,39,86,419</div>
+                </div>
+              </div>
+              <div class="pt-4">
+                <div class="text-xs text-emerald-700 font-semibold uppercase tracking-wider mb-1">Direct MF Commission Saved vs Regular Plan (1% Trail)</div>
+                <div id="sip-res-saved" class="text-lg font-bold font-mono text-emerald-600">+₹13,68,240 extra stays in your demat</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 7. SUPPORT PORTAL VIEW ==================== -->
+    <section id="view-support" class="app-view hidden">
+      <!-- Zerodha Signature Blue Support Hero -->
+      <div class="bg-[#387ed1] text-white py-12 sm:py-16">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <h1 class="text-xl sm:text-2xl font-semibold">Support Portal</h1>
+            <button type="button" onclick="openSupportTicketModal()" class="px-4 py-2 rounded bg-white/15 hover:bg-white/25 text-white text-xs sm:text-sm font-medium border border-white/30 transition w-fit">
+              + Create Support Ticket
+            </button>
+          </div>
+
+          <h2 class="text-xl sm:text-2xl font-normal mb-5">
+            Search for an answer or browse help topics to create a ticket
+          </h2>
+
+          <div class="relative mb-5">
+            <input id="support-search-input" type="text" oninput="filterSupportTopics()" placeholder="Eg: how do i activate F&O, why is my order rejected, CDSL TPIN..." class="w-full px-4 py-3.5 rounded text-sm sm:text-base text-[#424242] bg-white shadow focus:outline-none" />
+          </div>
+
+          <div class="flex flex-wrap gap-3 text-xs sm:text-sm">
+            <button type="button" onclick="showSupportAnswer('Track account opening')" class="underline hover:text-blue-100">Track account opening</button>
+            <button type="button" onclick="showSupportAnswer('Track segment activation')" class="underline hover:text-blue-100">Track segment activation</button>
+            <button type="button" onclick="showSupportAnswer('Intraday margins')" class="underline hover:text-blue-100">Intraday margins</button>
+            <button type="button" onclick="showSupportAnswer('Kite user manual')" class="underline hover:text-blue-100">Kite user manual</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Dynamic Support Answer Banner -->
+        <div id="support-answer-box" class="hidden mb-10 p-5 border border-blue-200 rounded-lg bg-blue-50/50">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h3 id="support-ans-title" class="font-semibold text-base text-[#424242] mb-1">Support Article</h3>
+              <p id="support-ans-body" class="text-xs sm:text-sm text-[#666666] leading-relaxed"></p>
+            </div>
+            <button type="button" onclick="closeSupportAnswer()" class="text-xs text-[#666666] hover:text-[#424242] px-2 py-1">✕</button>
+          </div>
+        </div>
+
+        <h3 class="text-lg sm:text-xl font-medium text-[#424242] mb-8">To create a ticket, select a relevant topic</h3>
+        <div id="support-topics-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-sm">
+          <div class="support-topic-card space-y-2.5">
+            <h4 class="font-semibold text-base text-[#424242] mb-3">⊕ Account Opening</h4>
+            <ul class="space-y-2 text-[#387ed1]">
+              <li><button type="button" onclick="showSupportAnswer('Resident individual account opening')" class="hover:underline text-left">Resident individual</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Minor Demat Account')" class="hover:underline text-left">Minor account</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Non Resident Indian NRI Account')" class="hover:underline text-left">Non Resident Indian (NRI)</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Company, Partnership, HUF and LLP')" class="hover:underline text-left">Company, Partnership, HUF and LLP</button></li>
+            </ul>
+          </div>
+
+          <div class="support-topic-card space-y-2.5">
+            <h4 class="font-semibold text-base text-[#424242] mb-3">👤 Your Shunyarodha Account</h4>
+            <ul class="space-y-2 text-[#387ed1]">
+              <li><button type="button" onclick="showSupportAnswer('Your Profile & Bank Mandate')" class="hover:underline text-left">Your Profile &amp; Bank Mandate</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Account modification & segment activation')" class="hover:underline text-left">Account modification</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Client Master Report CMR and DP')" class="hover:underline text-left">Client Master Report CMR and DP</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Nomination Online e-Sign')" class="hover:underline text-left">Nomination</button></li>
+            </ul>
+          </div>
+
+          <div class="support-topic-card space-y-2.5">
+            <h4 class="font-semibold text-base text-[#424242] mb-3">📈 Kite Trading &amp; Markets</h4>
+            <ul class="space-y-2 text-[#387ed1]">
+              <li><button type="button" onclick="showSupportAnswer('IPO UPI Application')" class="hover:underline text-left">IPO</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Trading FAQs & Order Types')" class="hover:underline text-left">Trading FAQs</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Margin Trading Facility MTF and Margins')" class="hover:underline text-left">Margin Trading Facility MTF and Margins</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Charts and GTT orders')" class="hover:underline text-left">Charts and GTT orders</button></li>
+            </ul>
+          </div>
+
+          <div class="support-topic-card space-y-2.5">
+            <h4 class="font-semibold text-base text-[#424242] mb-3">💳 Funds &amp; Withdrawals</h4>
+            <ul class="space-y-2 text-[#387ed1]">
+              <li><button type="button" onclick="showSupportAnswer('Add money via Instant UPI')" class="hover:underline text-left">Add money</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Withdraw money & settlement payout')" class="hover:underline text-left">Withdraw money</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Add bank accounts')" class="hover:underline text-left">Add bank accounts</button></li>
+              <li><button type="button" onclick="showSupportAnswer('eMandates for automated SIP')" class="hover:underline text-left">eMandates</button></li>
+            </ul>
+          </div>
+
+          <div class="support-topic-card space-y-2.5">
+            <h4 class="font-semibold text-base text-[#424242] mb-3">📊 Console &amp; Tax P&amp;L</h4>
+            <ul class="space-y-2 text-[#387ed1]">
+              <li><button type="button" onclick="showSupportAnswer('Portfolio & Family View')" class="hover:underline text-left">Portfolio</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Corporate actions Buybacks and Rights')" class="hover:underline text-left">Corporate actions</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Tax P&L and ITR Reports')" class="hover:underline text-left">Reports &amp; Tax P&amp;L</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Pledging shares for F&O margin')" class="hover:underline text-left">Pledging shares for margin</button></li>
+            </ul>
+          </div>
+
+          <div class="support-topic-card space-y-2.5">
+            <h4 class="font-semibold text-base text-[#424242] mb-3">🪙 Coin &amp; Mutual Funds</h4>
+            <ul class="space-y-2 text-[#387ed1]">
+              <li><button type="button" onclick="showSupportAnswer('Understanding direct mutual funds and Coin')" class="hover:underline text-left">Understanding mutual funds and Coin</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Coin app & AMC SIPs')" class="hover:underline text-left">Coin app</button></li>
+              <li><button type="button" onclick="showSupportAnswer('Fixed Income, Govt Bonds & SGBs')" class="hover:underline text-left">Fixed Income &amp; Govt Securities</button></li>
+              <li><button type="button" onclick="showSupportAnswer('National Pension System NPS')" class="hover:underline text-left">National Pension System NPS</button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 8. INTERACTIVE KITE WEB TRADING TERMINAL VIEW ==================== -->
+    <section id="view-kite" class="app-view hidden bg-[#f8fafc]">
+      <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-4">
+        <!-- Kite Top Sub-Bar -->
+        <div class="bg-white border border-[#eeeeee] rounded-t-lg px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <span class="px-2 py-0.5 rounded bg-[#ff5722] text-white font-bold text-xs tracking-wide">KITE 3.0</span>
+            <span class="text-xs text-[#666666]">Interactive Trading Terminal Simulator</span>
+          </div>
+          <!-- Kite Sub-Navigation Tabs -->
+          <div class="flex flex-wrap items-center gap-1 sm:gap-2 text-xs font-medium">
+            <button type="button" id="ktab-chart" onclick="switchKiteTab('chart')" class="px-3 py-1.5 rounded bg-orange-50 text-[#ff5722]">Dashboard &amp; Chart</button>
+            <button type="button" id="ktab-orders" onclick="switchKiteTab('orders')" class="px-3 py-1.5 rounded text-[#666666] hover:bg-slate-100">Orders (<span id="kite-order-count">2</span>)</button>
+            <button type="button" id="ktab-holdings" onclick="switchKiteTab('holdings')" class="px-3 py-1.5 rounded text-[#666666] hover:bg-slate-100">Holdings (5)</button>
+            <button type="button" id="ktab-funds" onclick="switchKiteTab('funds')" class="px-3 py-1.5 rounded text-[#666666] hover:bg-slate-100">Funds: <span id="kite-top-funds" class="font-mono font-semibold text-emerald-600">₹1,42,500</span></button>
+          </div>
+        </div>
+
+        <!-- Main Split Terminal Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 bg-white border-x border-b border-[#eeeeee] rounded-b-lg overflow-hidden min-h-[620px]">
+          <!-- Left Marketwatch Sidebar (4 cols on desktop) -->
+          <div class="lg:col-span-4 border-b lg:border-b-0 lg:border-r border-[#eeeeee] flex flex-col">
+            <!-- Search Input -->
+            <div class="p-3 border-b border-[#eeeeee] flex items-center gap-2 bg-slate-50/50">
+              <input id="kite-wl-search" type="text" oninput="renderWatchlist()" placeholder="Search eg: infy, reliance, tcs, sbin..." class="w-full px-3 py-1.5 text-xs border border-slate-200 rounded bg-white focus:outline-none focus:border-[#387ed1]" />
+              <span class="text-[11px] text-[#9b9b9b] font-mono shrink-0" id="kite-wl-count">10 / 50</span>
+            </div>
+
+            <!-- Watchlist Rows Container -->
+            <div id="kite-watchlist-container" class="divide-y divide-[#eeeeee] overflow-y-auto max-h-[420px] lg:max-h-[540px]"></div>
+
+            <!-- 5-Level Market Depth Drawer (Toggled when user clicks Depth D) -->
+            <div id="kite-depth-panel" class="p-3 bg-slate-50 border-t border-[#eeeeee] text-[11px]">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-semibold text-[#424242]">20-Level Market Depth: <span id="depth-symbol" class="text-[#387ed1]">RELIANCE</span></span>
+                <span class="text-[#9b9b9b]">NSE EQ</span>
+              </div>
+              <div class="grid grid-cols-2 gap-3 font-mono">
+                <div>
+                  <div class="flex justify-between text-[#9b9b9b] border-b border-slate-200 pb-1 mb-1">
+                    <span>BID</span><span>ORDERS</span><span>QTY</span>
+                  </div>
+                  <div id="depth-bids-list" class="space-y-0.5 text-blue-600"></div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-[#9b9b9b] border-b border-slate-200 pb-1 mb-1">
+                    <span>ASK</span><span>ORDERS</span><span>QTY</span>
+                  </div>
+                  <div id="depth-asks-list" class="space-y-0.5 text-rose-600"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Workspace Area (8 cols on desktop) -->
+          <div class="lg:col-span-8 p-4 sm:p-6 flex flex-col justify-between">
+            <!-- KITE TAB 1: CHART & ORDER TICKET -->
+            <div id="kite-view-chart" class="space-y-5">
+              <!-- Selected Scrip Header -->
+              <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#eeeeee]">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h2 id="kite-active-symbol" class="text-xl sm:text-2xl font-bold text-[#424242]">RELIANCE</h2>
+                    <span class="text-[11px] px-1.5 py-0.5 rounded bg-slate-100 text-[#666666] font-mono">NSE</span>
+                    <span id="kite-active-name" class="text-xs text-[#9b9b9b]">Reliance Industries Ltd.</span>
+                  </div>
+                  <div class="flex items-baseline gap-2 mt-1">
+                    <span id="kite-active-ltp" class="text-2xl font-bold font-mono text-[#424242]">₹2,945.60</span>
+                    <span id="kite-active-chg" class="text-xs font-mono font-semibold text-emerald-600">+34.20 (+1.17%)</span>
+                  </div>
+                </div>
+
+                <!-- Quick Buy / Sell Buttons + Timeframe Pills -->
+                <div class="flex flex-wrap items-center gap-2">
+                  <button type="button" onclick="openOrderPad('BUY')" class="px-4 py-1.5 rounded bg-[#387ed1] hover:bg-blue-700 text-white text-xs font-semibold transition">B Buy</button>
+                  <button type="button" onclick="openOrderPad('SELL')" class="px-4 py-1.5 rounded bg-[#ff5722] hover:bg-orange-700 text-white text-xs font-semibold transition">S Sell</button>
+                  <div class="flex items-center border border-slate-200 rounded overflow-hidden text-xs ml-1">
+                    <button type="button" id="tf-1D" onclick="setChartTimeframe('1D')" class="px-2.5 py-1 bg-slate-800 text-white">1D</button>
+                    <button type="button" id="tf-1W" onclick="setChartTimeframe('1W')" class="px-2.5 py-1 bg-white text-[#666666] hover:bg-slate-50">1W</button>
+                    <button type="button" id="tf-1M" onclick="setChartTimeframe('1M')" class="px-2.5 py-1 bg-white text-[#666666] hover:bg-slate-50">1M</button>
+                    <button type="button" id="tf-1Y" onclick="setChartTimeframe('1Y')" class="px-2.5 py-1 bg-white text-[#666666] hover:bg-slate-50">1Y</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Chart Container (Fixed Height Rule from web-app-generation) -->
+              <div class="relative h-72 w-full bg-white border border-[#eeeeee] rounded-lg p-3">
+                <canvas id="kite-price-chart"></canvas>
+              </div>
+
+              <!-- Inline Quick Order Ticket Pad (Buy Blue / Sell Orange) -->
+              <div id="kite-order-pad" class="border-2 border-[#387ed1] rounded-lg overflow-hidden bg-white shadow-sm">
+                <div id="order-pad-header" class="bg-[#387ed1] text-white px-4 py-2.5 flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span id="order-pad-side-badge" class="font-bold text-xs uppercase tracking-wider">BUY</span>
+                    <span id="order-pad-sym" class="font-semibold text-sm">RELIANCE</span>
+                    <span class="text-xs opacity-80">× NSE</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-xs">
+                    <button type="button" onclick="openOrderPad('BUY')" class="px-2 py-0.5 rounded bg-white/20 hover:bg-white/30">Buy</button>
+                    <button type="button" onclick="openOrderPad('SELL')" class="px-2 py-0.5 rounded bg-white/20 hover:bg-white/30">Sell</button>
+                  </div>
+                </div>
+                <div class="p-4 space-y-4">
+                  <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div class="flex items-center gap-4">
+                      <label class="flex items-center gap-1.5 cursor-pointer font-medium">
+                        <input type="radio" name="kite-prod" value="MIS" checked onchange="updateOrderMargin()" class="accent-[#387ed1]" />
+                        <span>Intraday <span class="text-[#9b9b9b]">MIS (5x)</span></span>
+                      </label>
+                      <label class="flex items-center gap-1.5 cursor-pointer font-medium">
+                        <input type="radio" name="kite-prod" value="CNC" onchange="updateOrderMargin()" class="accent-[#387ed1]" />
+                        <span>Longterm <span class="text-[#9b9b9b]">CNC (1x)</span></span>
+                      </label>
+                    </div>
+                    <div class="flex items-center gap-4">
+                      <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="radio" name="kite-otype" value="MARKET" checked onchange="updateOrderMargin()" class="accent-[#387ed1]" />
+                        <span>Market</span>
+                      </label>
+                      <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="radio" name="kite-otype" value="LIMIT" onchange="updateOrderMargin()" class="accent-[#387ed1]" />
+                        <span>Limit</span>
+                      </label>
+                      <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="radio" name="kite-otype" value="GTT" onchange="updateOrderMargin()" class="accent-[#387ed1]" />
+                        <span>GTT</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                    <div>
+                      <label for="kite-ord-qty" class="block text-[11px] text-[#666666] mb-1">Qty.</label>
+                      <input id="kite-ord-qty" type="number" min="1" value="10" oninput="updateOrderMargin()" class="w-full px-3 py-2 text-sm font-mono border border-slate-300 rounded focus:outline-none focus:border-[#387ed1]" />
+                    </div>
+                    <div>
+                      <label for="kite-ord-price" class="block text-[11px] text-[#666666] mb-1">Price (₹)</label>
+                      <input id="kite-ord-price" type="number" step="0.05" value="2945.60" oninput="updateOrderMargin()" class="w-full px-3 py-2 text-sm font-mono border border-slate-300 rounded focus:outline-none focus:border-[#387ed1]" />
+                    </div>
+                    <div>
+                      <button type="button" id="kite-submit-order-btn" onclick="submitKiteOrder()" class="w-full py-2.5 rounded text-white font-semibold text-sm bg-[#387ed1] hover:opacity-95 transition">
+                        Instant Buy
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-wrap items-center justify-between text-xs text-[#666666] pt-2 border-t border-slate-100">
+                    <div>
+                      Margin required: <span id="kite-req-margin" class="font-mono font-semibold text-[#424242]">₹5,891.20</span>
+                      <span class="mx-1">•</span>
+                      Est. charges: <span id="kite-est-charges" class="font-mono text-[#424242]">₹21.40</span>
+                    </div>
+                    <div id="kite-nudge-msg" class="text-[11px] text-emerald-700 font-medium">
+                      ✓ Nudge Check: Scrip under normal surveillance (GSM Stage 0)
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- KITE TAB 2: ORDERS & GTT -->
+            <div id="kite-view-orders" class="hidden space-y-4">
+              <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-[#424242]">Executed &amp; Open Orders</h3>
+                <button type="button" onclick="switchKiteTab('chart')" class="text-xs text-[#387ed1] hover:underline">+ Place New Order</button>
+              </div>
+              <div class="overflow-x-auto border border-[#eeeeee] rounded-lg">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-slate-50 text-[#666666] border-b border-[#eeeeee]">
+                    <tr>
+                      <th class="p-3">Time</th>
+                      <th class="p-3">Type</th>
+                      <th class="p-3">Instrument</th>
+                      <th class="p-3">Product</th>
+                      <th class="p-3 text-right">Qty.</th>
+                      <th class="p-3 text-right">Avg. Price</th>
+                      <th class="p-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="kite-orders-tbody" class="divide-y divide-[#eeeeee] font-mono"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- KITE TAB 3: HOLDINGS & KILL SWITCH -->
+            <div id="kite-view-holdings" class="hidden space-y-5">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h3 class="text-lg font-semibold text-[#424242]">Demat Holdings (5)</h3>
+                  <p class="text-xs text-[#666666]">CDSL Demat Holding Statement synced with Console</p>
+                </div>
+                <!-- Signature Zerodha Kill Switch Toggle -->
+                <div class="flex items-center gap-2 p-2 rounded border border-rose-200 bg-rose-50/50">
+                  <span class="text-xs font-medium text-rose-800">Overtrading Kill Switch:</span>
+                  <button type="button" id="btn-kill-switch" onclick="toggleKillSwitch()" class="px-2.5 py-1 rounded text-xs font-semibold bg-white border border-rose-300 text-rose-700 hover:bg-rose-600 hover:text-white transition">
+                    Active (Click to Disable F&amp;O)
+                  </button>
+                </div>
+              </div>
+              <div class="overflow-x-auto border border-[#eeeeee] rounded-lg">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-slate-50 text-[#666666] border-b border-[#eeeeee]">
+                    <tr>
+                      <th class="p-3">Instrument</th>
+                      <th class="p-3 text-right">Qty.</th>
+                      <th class="p-3 text-right">Avg. Cost</th>
+                      <th class="p-3 text-right">LTP</th>
+                      <th class="p-3 text-right">Cur. Val</th>
+                      <th class="p-3 text-right">Net P&amp;L</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-[#eeeeee] font-mono">
+                    <tr>
+                      <td class="p-3 font-sans font-semibold text-[#424242]">RELIANCE</td>
+                      <td class="p-3 text-right">25</td>
+                      <td class="p-3 text-right">₹2,480.00</td>
+                      <td class="p-3 text-right">₹2,945.60</td>
+                      <td class="p-3 text-right">₹73,640.00</td>
+                      <td class="p-3 text-right text-emerald-600 font-semibold">+₹11,640.00 (+18.77%)</td>
+                    </tr>
+                    <tr>
+                      <td class="p-3 font-sans font-semibold text-[#424242]">TCS</td>
+                      <td class="p-3 text-right">15</td>
+                      <td class="p-3 text-right">₹3,620.00</td>
+                      <td class="p-3 text-right">₹4,118.40</td>
+                      <td class="p-3 text-right">₹61,776.00</td>
+                      <td class="p-3 text-right text-emerald-600 font-semibold">+₹7,476.00 (+13.76%)</td>
+                    </tr>
+                    <tr>
+                      <td class="p-3 font-sans font-semibold text-[#424242]">HDFCBANK</td>
+                      <td class="p-3 text-right">40</td>
+                      <td class="p-3 text-right">₹1,540.00</td>
+                      <td class="p-3 text-right">₹1,728.90</td>
+                      <td class="p-3 text-right">₹69,156.00</td>
+                      <td class="p-3 text-right text-emerald-600 font-semibold">+₹7,556.00 (+12.26%)</td>
+                    </tr>
+                    <tr>
+                      <td class="p-3 font-sans font-semibold text-[#424242]">INFY</td>
+                      <td class="p-3 text-right">30</td>
+                      <td class="p-3 text-right">₹1,680.00</td>
+                      <td class="p-3 text-right">₹1,862.50</td>
+                      <td class="p-3 text-right">₹55,875.00</td>
+                      <td class="p-3 text-right text-emerald-600 font-semibold">+₹5,475.00 (+10.86%)</td>
+                    </tr>
+                    <tr>
+                      <td class="p-3 font-sans font-semibold text-[#424242]">ICICIBANK</td>
+                      <td class="p-3 text-right">50</td>
+                      <td class="p-3 text-right">₹1,040.00</td>
+                      <td class="p-3 text-right">₹1,284.20</td>
+                      <td class="p-3 text-right">₹64,210.00</td>
+                      <td class="p-3 text-right text-emerald-600 font-semibold">+₹12,210.00 (+23.48%)</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- KITE TAB 4: FUNDS & INSTANT UPI DEPOSIT -->
+            <div id="kite-view-funds" class="hidden space-y-5">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div class="p-5 border border-[#eeeeee] rounded-lg space-y-3">
+                  <div class="text-xs font-semibold uppercase tracking-wider text-[#9b9b9b]">Equity &amp; Derivatives Margin</div>
+                  <div class="flex justify-between items-baseline">
+                    <span class="text-sm text-[#666666]">Available cash margin</span>
+                    <span id="funds-avail-val" class="text-2xl font-bold font-mono text-emerald-600">₹1,42,500.00</span>
+                  </div>
+                  <div class="flex justify-between text-xs text-[#666666] pt-2 border-t border-slate-100">
+                    <span>Used margin</span>
+                    <span id="funds-used-val" class="font-mono text-[#424242]">₹18,420.00</span>
+                  </div>
+                  <div class="flex justify-between text-xs text-[#666666]">
+                    <span>Collateral (Liquid ETFs &amp; SGB)</span>
+                    <span class="font-mono text-[#424242]">₹45,000.00</span>
+                  </div>
+                </div>
+
+                <div class="p-5 border border-[#eeeeee] rounded-lg space-y-3 bg-slate-50/60">
+                  <div class="text-sm font-semibold text-[#424242]">Instant Add Funds via UPI (₹0 Fee)</div>
+                  <div>
+                    <label for="upi-add-amount" class="block text-xs text-[#666666] mb-1">Amount to Add (₹)</label>
+                    <input id="upi-add-amount" type="number" min="100" step="500" value="25000" class="w-full px-3 py-2 text-sm font-mono border border-slate-300 rounded bg-white" />
+                  </div>
+                  <button type="button" onclick="addDemoFunds()" class="btn-sr-primary w-full py-2.5 text-xs sm:text-sm">
+                    + Add Margin Instantly via UPI
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MODALS & TOAST NOTIFICATIONS ==================== -->
+  <!-- Toast Notification -->
+  <div id="app-toast" class="fixed bottom-5 right-5 z-50 hidden max-w-sm bg-slate-900 text-white px-4 py-3 rounded-lg shadow-xl border border-slate-700 text-xs sm:text-sm flex items-center gap-3">
+    <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+    <span id="app-toast-text">Action completed</span>
+  </div>
+
+  <!-- Modal Container (Used for IPO Watch, Market Holidays, and Support Ticket) -->
+  <div id="global-modal-backdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-xl max-w-lg w-full p-6 shadow-2xl border border-[#eeeeee]">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-[#eeeeee]">
+        <h3 id="global-modal-title" class="text-lg font-semibold text-[#424242]">Modal Title</h3>
+        <button type="button" onclick="closeGlobalModal()" class="text-[#666666] hover:text-[#222222] text-sm px-2 py-1">✕</button>
+      </div>
+      <div id="global-modal-body" class="text-xs sm:text-sm text-[#666666] space-y-3"></div>
+      <div class="mt-6 pt-3 border-t border-[#eeeeee] flex justify-end">
+        <button type="button" onclick="closeGlobalModal()" class="px-4 py-2 rounded bg-slate-100 hover:bg-slate-200 text-[#424242] text-xs font-medium">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== ZERODHA SIGNATURE COMPREHENSIVE FOOTER ==================== -->
+  <footer class="bg-[#fbfbfb] border-t border-[#eeeeee] text-[#666666] mt-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 pb-12 border-b border-[#eeeeee]">
+        <!-- Brand Column -->
+        <div class="lg:col-span-2 space-y-3">
+          <div class="flex items-center gap-2">
+            <svg class="w-6 h-6 text-[#387ed1]" viewBox="0 0 36 36" fill="none">
+              <path d="M4 28L18 6L32 28H23.5L18 18.8L12.5 28H4Z" fill="#387ed1"/>
+            </svg>
+            <span class="text-lg font-bold tracking-[0.14em] text-[#387ed1]">SHUNYARODHA</span>
+          </div>
+          <p class="text-xs text-[#666666] leading-relaxed">
+            © 2010 - 2026, Shunyarodha Broking Ltd.<br/>
+            All rights reserved. Inspired by <a href="https://zerodha.com" target="_blank" rel="noopener noreferrer" class="text-[#387ed1] hover:underline">Zerodha</a>.
+          </p>
+          <div class="flex items-center gap-3 text-xs text-[#9b9b9b] pt-1">
+            <span>NSE</span><span>•</span><span>BSE</span><span>•</span><span>MCX</span><span>•</span><span>CDSL</span><span>•</span><span>SEBI Reg.</span>
+          </div>
+        </div>
+
+        <!-- Company Links -->
+        <div>
+          <h4 class="font-semibold text-[#424242] text-sm mb-3">Company</h4>
+          <ul class="space-y-2 text-xs sm:text-sm">
+            <li><button type="button" onclick="switchView('about')" class="hover:text-[#387ed1]">About</button></li>
+            <li><button type="button" onclick="switchView('products')" class="hover:text-[#387ed1]">Products</button></li>
+            <li><button type="button" onclick="switchView('pricing')" class="hover:text-[#387ed1]">Pricing</button></li>
+            <li><button type="button" onclick="switchView('about')" class="hover:text-[#387ed1]">Philosophy &amp; Rainmatter</button></li>
+            <li><button type="button" onclick="openHolidayModal()" class="hover:text-[#387ed1]">Market Holiday Calendar</button></li>
+          </ul>
+        </div>
+
+        <!-- Support Links -->
+        <div>
+          <h4 class="font-semibold text-[#424242] text-sm mb-3">Support</h4>
+          <ul class="space-y-2 text-xs sm:text-sm">
+            <li><button type="button" onclick="switchView('support')" class="hover:text-[#387ed1]">Contact us</button></li>
+            <li><button type="button" onclick="switchView('support')" class="hover:text-[#387ed1]">Support portal</button></li>
+            <li><button type="button" onclick="switchView('pricing')" class="hover:text-[#387ed1]">List of charges</button></li>
+            <li><button type="button" onclick="switchView('varsity')" class="hover:text-[#387ed1]">Varsity education</button></li>
+            <li><button type="button" onclick="openIpoModal()" class="hover:text-[#387ed1]">Upcoming IPO Watch</button></li>
+          </ul>
+        </div>
+
+        <!-- Account Links -->
+        <div>
+          <h4 class="font-semibold text-[#424242] text-sm mb-3">Account</h4>
+          <ul class="space-y-2 text-xs sm:text-sm">
+            <li><button type="button" onclick="switchView('signup')" class="hover:text-[#387ed1]">Open an account</button></li>
+            <li><button type="button" onclick="switchView('kite')" class="hover:text-[#387ed1]">Fund transfer (UPI)</button></li>
+            <li><button type="button" onclick="switchView('kite')" class="hover:text-[#387ed1]">Launch Kite Web</button></li>
+            <li><button type="button" onclick="switchView('pricing')" class="hover:text-[#387ed1]">Brokerage Calculator</button></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Fine Print Regulatory Disclaimers (Iconic Zerodha Footer Block) -->
+      <div class="pt-8 space-y-3 text-[11px] text-[#9b9b9b] leading-relaxed">
+        <p>
+          Shunyarodha Broking Ltd.: Member of NSE, BSE &amp; MCX – SEBI Registration no.: INZ000031633. CDSL/NSDL: Depository services through Shunyarodha Broking Ltd. – SEBI Registration no.: IN-DP-431-2019. Commodity Trading through Shunyarodha Commodities Pvt. Ltd. MCX: 46025. Registered Address: #153/154, 4th Cross, Dollars Colony, Opp. Clarence Public School, J.P Nagar 4th Phase, Bengaluru - 560078, Karnataka, India.
+        </p>
+        <p>
+          Procedure to file a complaint on SEBI SCORES: Register on SCORES portal. Mandatory details for filing complaints on SCORES: Name, PAN, Address, Mobile Number, E-mail ID. Benefits: Effective Communication, Speedy redressal of the grievances. Smart Online Dispute Resolution | Grievances Redressal Mechanism.
+        </p>
+        <p>
+          Investments in securities market are subject to market risks; read all the related documents carefully before investing. Prevent unauthorized transactions in your account. Update your mobile numbers/email IDs with your stock brokers. Receive information of your transactions directly from Exchange on your mobile/email at the end of the day. KYC is one time exercise while dealing in securities markets - once KYC is done through a SEBI registered intermediary (broker, DP, Mutual Fund etc.), you need not undergo the same process again when you approach another intermediary.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
