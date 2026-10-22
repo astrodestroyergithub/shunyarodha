@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="shunyaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00E676" />
+      <stop offset="100%" stop-color="#00B0FF" />
+    </linearGradient>
+  </defs>
+  <!-- App Icon Background -->
+  <rect width="64" height="64" rx="14" fill="#0B0F19" />
+  <!-- Stylized 'S' and Upward Growth / Shunya Motif -->
+  <path d="M22 20C22 16 26 14 32 14C38 14 42 17 42 22C42 27 32 29 32 34C32 39 42 41 42 46C42 51 38 54 32 54C26 54 22 51 22 47" fill="none" stroke="url(#shunyaGrad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Upward Trend Indicator Dot -->
+  <circle cx="42" cy="16" r="4" fill="#00E676" />
+</svg>
